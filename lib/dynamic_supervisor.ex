@@ -25,8 +25,8 @@ defmodule DynSupervisor do
     DynamicSupervisor.terminate_child(__MODULE__, pid)
   end
 
-  def compune_and_send_forecast(pid, msg, aggregator_pid) do
-    GenServer.cast(pid, {:compute, msg, aggregator_pid})
+  def compune_and_send_forecast(pid, msg) do
+    GenServer.cast(pid, {:compute, msg})
   end
 
   def count_children do

@@ -29,4 +29,4 @@ COPY . .
 RUN mix compile
 
 # Run the application itself
-CMD mix run
+CMD ./script.sh

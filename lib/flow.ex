@@ -2,15 +2,14 @@ defmodule DataFlow do
   use GenServer, restart: :permanent
 
   def start_link(msg) do
-    GenServer.start_link(__MODULE__, msg)
+    GenServer.start_link(__MODULE__, msg, name: __MODULE__)
   end
 
   @impl true
-  def init(msg) do
+  def init(_msg) do
     counter = 0
     start_time = Time.utc_now()
     current_flow = 3
-    state = [counter | start_time]
     state = %{counter: counter, start_time: start_time, current_flow: current_flow}
     {:ok, state}
   end

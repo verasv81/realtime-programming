@@ -1,0 +1,8 @@
+version: '3'    
+services:
+    server:
+        image: alexburlacu/rtp-server
+        ports:  [4000:4000]
+    elixir-forecast:
+        build: 
+            context: .
