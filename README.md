@@ -6,11 +6,13 @@ This app is gathering data from 10 sensors (light, wind speed, humidity, atmosph
 
 ## Installation
 ### Run Local
+
+Get project from git:
 ```bash 
   git pull https://github.com/verasv81/realtime-programming.git
 ```
-
-```shell
+Run using: 
+```bash
   docker-compose up
 ```
 
