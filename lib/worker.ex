@@ -13,7 +13,7 @@ defmodule ForecastWorker do
   @impl true
   def handle_cast({:compute, msg, aggregator_pid}, states) do
     data = json_parse(msg)
-    data = calc_mean(data)
+    data = calc_avg(data)
     frc = forecast(data)
     GenServer.cast(aggregator_pid, {:forecast, frc})
     {:noreply, []}
@@ -24,22 +24,22 @@ defmodule ForecastWorker do
     msg_data["message"]
   end
 
-  defp calc_mean(data) do
+  defp calc_avg(data) do
     atmo_pressure_sensor_1 = data["atmo_pressure_sensor_1"]
     atmo_pressure_sensor_2 = data["atmo_pressure_sensor_2"]
-    atmo_pressure_sensor = mean(atmo_pressure_sensor_1, atmo_pressure_sensor_2)
+    atmo_pressure_sensor = avg(atmo_pressure_sensor_1, atmo_pressure_sensor_2)
     humidity_sensor_1 = data["humidity_sensor_1"]
     humidity_sensor_2 = data["humidity_sensor_2"]
-    humidity_sensor = mean(humidity_sensor_1, humidity_sensor_2)
+    humidity_sensor = avg(humidity_sensor_1, humidity_sensor_2)
     light_sensor_1 = data["light_sensor_1"]
     light_sensor_2 = data["light_sensor_2"]
-    light_sensor = mean(light_sensor_1, light_sensor_2)
+    light_sensor = avg(light_sensor_1, light_sensor_2)
     temperature_sensor_1 = data["temperature_sensor_1"]
     temperature_sensor_2 = data["temperature_sensor_2"]
-    temperature_sensor = mean(temperature_sensor_1, temperature_sensor_2)
+    temperature_sensor = avg(temperature_sensor_1, temperature_sensor_2)
     wind_speed_sensor_1 = data["wind_speed_sensor_1"]
     wind_speed_sensor_2 = data["wind_speed_sensor_2"]
-    wind_speed_sensor = mean(wind_speed_sensor_1, wind_speed_sensor_2)
+    wind_speed_sensor = avg(wind_speed_sensor_1, wind_speed_sensor_2)
     unix_timestamp_us = data["unix_timestamp_us"]
 
     map = %{
@@ -55,65 +55,66 @@ defmodule ForecastWorker do
   end
 
   defp forecast(data) do
+    timestamp = data[:unix_timestamp_us] |> DateTime.from_unix(:microsecond) |> elem(1)
     cond do
       data[:temperature_sensor] < -2 && data[:light_sensor] < 128 &&
           data[:atmo_pressure_sensor] < 720 ->
-        "SNOW"
+        "Weather forecast for #{timestamp}: SNOW"
 
       data[:temperature_sensor] < -2 && data[:light_sensor] > 128 &&
           data[:atmo_pressure_sensor] < 680 ->
-        "WET_SNOW"
+        "Weather forecast for #{timestamp}: WET_SNOW"
 
       data[:temperature_sensor] < -8 ->
-        "SNOW"
+        "Weather forecast for #{timestamp}:SNOW"
 
       data[:temperature_sensor] < -15 && data[:wind_speed_sensor] > 45 ->
-        "BLIZZARD"
+        "Weather forecast for #{timestamp}:BLIZZARD"
 
       data[:temperature_sensor] > 0 && data[:atmo_pressure_sensor] < 710 &&
         data[:humidity_sensor] > 70 &&
           data[:wind_speed_sensor] < 20 ->
-        "SLIGHT_RAIN"
+        "Weather forecast for #{timestamp}:SLIGHT_RAIN"
 
       data[:temperature_sensor] > 0 && data[:atmo_pressure_sensor] < 690 &&
         data[:humidity_sensor] > 70 &&
           data[:wind_speed_sensor] > 20 ->
-        "HEAVY_RAIN"
+        "Weather forecast for #{timestamp}: HEAVY_RAIN"
 
       data[:temperature_sensor] > 30 && data[:atmo_pressure_sensor] < 770 &&
         data[:humidity_sensor] > 80 &&
           data[:light_sensor] > 192 ->
-        "HOT"
+        "Weather forecast for #{timestamp}: HOT"
 
       data[:temperature_sensor] > 30 && data[:atmo_pressure_sensor] < 770 &&
         data[:humidity_sensor] > 50 &&
         data[:light_sensor] > 192 && data[:wind_speed_sensor] > 35 ->
-        "CONVECTION_OVEN"
+        "Weather forecast for #{timestamp}: CONVECTION_OVEN"
 
       data[:temperature_sensor] > 25 && data[:atmo_pressure_sensor] < 750 &&
         data[:humidity_sensor] > 70 &&
         data[:light_sensor] < 192 && data[:wind_speed_sensor] < 10 ->
-        "CONVECTION_OVEN"
+        "Weather forecast for #{timestamp}: CONVECTION_OVEN"
 
       data[:temperature_sensor] > 25 && data[:atmo_pressure_sensor] < 750 &&
         data[:humidity_sensor] > 70 &&
         data[:light_sensor] < 192 && data[:wind_speed_sensor] > 10 ->
-        "SLIGHT_BREEZE"
+        "Weather forecast for #{timestamp}: SLIGHT_BREEZE"
 
       data[:light_sensor] < 128 ->
-        "CLOUDY"
+        "Weather forecast for #{timestamp}: CLOUDY"
 
       data[:temperature_sensor] > 30 && data[:atmo_pressure_sensor] < 660 &&
         data[:humidity_sensor] > 85 &&
           data[:wind_speed_sensor] > 45 ->
-        "MONSOON"
+        "Weather forecast for #{timestamp}: MONSOON"
 
       true ->
-        "JUST_A_NORMAL_DAY"
+        "Weather forecast for #{timestamp}: JUST_A_NORMAL_DAY"
     end
   end
 
-  defp mean(a, b) do
+  defp avg(a, b) do
     a + b / 2
   end
 end
