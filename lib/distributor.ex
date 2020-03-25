@@ -38,7 +38,7 @@ defmodule Distributor do
   end
 
   defp compute_forecast(pids_list, counter, msg) do
-    DynSupervisor.compune_and_send_forecast(Enum.at(pids_list, counter), msg)
+    DynSupervisor.calculate_and_send_forecast(Enum.at(pids_list, counter), msg)
   end
 
   defp create_worker(msg) do

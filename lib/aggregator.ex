@@ -2,7 +2,7 @@ defmodule Aggregator do
   use GenServer, restart: :permanent
 
   def start_link(forecast) do
-    Process.sleep(1000)
+    Process.sleep(5000)
     GenServer.start_link(__MODULE__, forecast, name: __MODULE__)
   end
 
