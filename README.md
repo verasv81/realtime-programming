@@ -19,6 +19,9 @@ Run using:
 **or**
 
 ```shell
+ docker pull alexburlacu/rtp-server
+ docker run -p 4000:4000 --rm alexburlacu/rtp-server
+ //another terminal
   mix run
 ```
 
