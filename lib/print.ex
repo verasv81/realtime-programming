@@ -16,7 +16,7 @@ defmodule Print do
 
     if diff > update_frequency && is_working === true do
       forecast = GenServer.call(Aggregator, :get_forecast)
-      print(forecast, date_time_now)
+      print(forecast[:final_forecast], date_time_now)
       get_forecast(time_now, update_frequency, is_working)
     else
       receive do
@@ -37,16 +37,10 @@ defmodule Print do
  
 
   def print(forecast, date_time_now) do
-    sensor_list = forecast[:final_sensor_value]
     IO.puts("-------------------------------")
     IO.puts("Forecast for #{date_time_now.day}/#{date_time_now.month}/#{date_time_now.year} #{date_time_now.hour}:#{date_time_now.minute}")
-    IO.puts("-------------------------------")    
-    IO.puts("Temperature -> #{sensor_list[:temperature_sensor]}")
-    IO.puts("Humidity -> #{sensor_list[:humidity_sensor]}")
-    IO.puts("Pressure -> #{sensor_list[:atmo_pressure_sensor]}")
-    IO.puts("Wind -> #{sensor_list[:wind_speed_sensor]}")
-    IO.puts("Light -> #{sensor_list[:light_sensor]}")
-    IO.puts("*******#{forecast[:final_forecast]}*******")
+    IO.puts("-------------------------------")
+    IO.puts("*******#{forecast}*******")
     IO.puts("-------------------------------")
   end
 end
